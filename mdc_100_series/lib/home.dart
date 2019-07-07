@@ -13,6 +13,59 @@
 // limitations under the License.
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+import 'model/product.dart';
+import 'model/products_repository.dart';
+
+List<Card> _buildGridDate(BuildContext context) {
+  final products = ProductsRepository.loadProducts(Category.all);
+
+  if (products == null || products.isEmpty) {
+    return <Card>[];
+  }
+
+  final theme = Theme.of(context);
+  final formatter = NumberFormat.simpleCurrency(
+      locale: Localizations.localeOf(context).toString());
+
+  return products
+      .map((product) => Card(
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                AspectRatio(
+                  aspectRatio: 18.0 / 11.0,
+                  child: Image.asset(
+                    product.assetName,
+                    package: product.assetPackage,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                      padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            product.assetName,
+                            style: theme.textTheme.title,
+                          ),
+                          SizedBox(height: 8.0),
+                          Text(
+                            formatter.format(product.price),
+                            style: theme.textTheme.body2,
+                          ),
+                        ],
+                      )),
+                )
+              ],
+            ),
+          ))
+      .toList();
+}
 
 class HomePage extends StatelessWidget {
   // TODO: Make a collection of cards (102)
@@ -22,33 +75,6 @@ class HomePage extends StatelessWidget {
     // TODO: Return an AsymmetricView (104)
     // TODO: Pass Category variable to AsymmetricView (104)
 
-    List<Card> _buildGridDate(int count) {
-      return List.generate(
-          count,
-          (int index) => Card(
-                clipBehavior: Clip.antiAlias,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    AspectRatio(
-                      aspectRatio: 18.0 / 11.0,
-                      child: Image.asset('assets/diamond.png'),
-                    ),
-                    Padding(
-                        padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text('Title'),
-                            SizedBox(height: 8.0),
-                            Text('Secondary Text'),
-                          ],
-                        )),
-                  ],
-                ),
-              ));
-    }
-    
     return Scaffold(
       // TODO: Add app bar (102)
       appBar: AppBar(
@@ -86,11 +112,9 @@ class HomePage extends StatelessWidget {
           crossAxisCount: 2,
           padding: EdgeInsets.all(16.0),
           childAspectRatio: 8.0 / 9.0,
-          children: _buildGridDate(10)),
+          children: _buildGridDate(context)),
       // TODO: Set resizeToAvoidBottomInset (101)
       resizeToAvoidBottomInset: false,
     );
-
-    
   }
 }
